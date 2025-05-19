@@ -1,6 +1,6 @@
 name: cuoral_flutter
 description: "A Flutter plugin to integrate Cuoral SDK for customer support and engagement."
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/cuoral/cuoral_flutter.git
 
 environment:
