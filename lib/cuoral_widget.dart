@@ -5,14 +5,9 @@ import 'package:flutter/foundation.dart';
 class CuoralWidget extends StatefulWidget {
   final String publicKey;
   final bool showWidget;
-  final WebViewController? webViewController; // Receive the controller
 
-  CuoralWidget({
-    super.key,
-    required this.publicKey,
-    this.showWidget = true,
-    this.webViewController,
-  }) : assert(publicKey.isNotEmpty, "publicKey must not be empty");
+  CuoralWidget({super.key, required this.publicKey, this.showWidget = true})
+    : assert(publicKey.isNotEmpty, "publicKey must not be empty");
 
   @override
   State<CuoralWidget> createState() => _CuoralWidgetState();
@@ -42,7 +37,7 @@ class _CuoralWidgetState extends State<CuoralWidget> {
               });
             },
             onPageFinished: (_) {
-              Future.delayed(Duration(seconds: 4), () {
+              Future.delayed(Duration(seconds: 5), () {
                 // wait for 4 seconds so widget can be fully loaded
                 setState(() {
                   _isLoading = false;

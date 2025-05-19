@@ -25,40 +25,6 @@ class CuoralLauncher extends StatefulWidget {
 }
 
 class _CuoralLauncherState extends State<CuoralLauncher> {
-  late final WebViewController _webViewController;
-  bool _isWebViewInitialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _webViewController =
-        WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..setNavigationDelegate(
-            NavigationDelegate(
-              onPageStarted: (_) {
-                setState(() {
-                  _isWebViewInitialized = true;
-                });
-              },
-              onPageFinished: (_) {
-                setState(() {
-                  _isWebViewInitialized = true;
-                });
-              },
-              onWebResourceError: (WebResourceError error) {
-                if (kDebugMode) {
-                  print("WebView Error: ${error.description}");
-                }
-                setState(() {
-                  _isWebViewInitialized = true;
-                });
-              },
-              onNavigationRequest: (_) => NavigationDecision.navigate,
-            ),
-          );
-  }
-
   @override
   Widget build(BuildContext context) {
     // Only display the FAB if isVisible is true
@@ -82,9 +48,9 @@ class _CuoralLauncherState extends State<CuoralLauncher> {
   }
 
   void _showCuoralModal(BuildContext context) {
-    if (!_isWebViewInitialized) {
-      return;
-    }
+    // if (!_isWebViewInitialized) {
+    //   return;
+    // }
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -122,7 +88,6 @@ class _CuoralLauncherState extends State<CuoralLauncher> {
                             child: CuoralWidget(
                               publicKey: widget.publicKey,
                               showWidget: true,
-                              webViewController: _webViewController,
                             ),
                           ),
                           Padding(
