@@ -5,6 +5,10 @@ import 'package:flutter/foundation.dart';
 
 class CuoralLauncher extends StatefulWidget {
   final String publicKey;
+  final String? email;
+  final String? firstName;
+  final String? lastName;
+
   final Color backgroundColor;
   final Icon icon;
   final bool isVisible;
@@ -16,7 +20,10 @@ class CuoralLauncher extends StatefulWidget {
     this.backgroundColor = Colors.blueAccent, // Default background color
     this.icon = const Icon(Icons.chat), // Default icon
     this.isVisible = true, // Default to visible
-    this.position = Alignment.bottomRight, // Default position
+    this.position = Alignment.bottomRight,
+    this.email,
+    this.firstName,
+    this.lastName, // Default position
   });
 
   @override
@@ -48,9 +55,6 @@ class _CuoralLauncherState extends State<CuoralLauncher> {
   }
 
   void _showCuoralModal(BuildContext context) {
-    // if (!_isWebViewInitialized) {
-    //   return;
-    // }
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -68,7 +72,7 @@ class _CuoralLauncherState extends State<CuoralLauncher> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10.0,
-                    vertical: 30.0,
+                    vertical: 50.0,
                   ),
                   child: Material(
                     color: Colors.white,
@@ -88,6 +92,9 @@ class _CuoralLauncherState extends State<CuoralLauncher> {
                             child: CuoralWidget(
                               publicKey: widget.publicKey,
                               showWidget: true,
+                              email: widget.email,
+                              firstName: widget.firstName,
+                              lastName: widget.lastName,
                             ),
                           ),
                           Padding(

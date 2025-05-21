@@ -41,6 +41,9 @@ class _CuoralOverlayExampleState extends State<CuoralOverlayExample> {
 
         CuoralLauncher(
           publicKey: _publicKey,
+          email: "", //optional
+          firstName: "", //optional
+          lastName: "", //optional
           backgroundColor: Colors.blueAccent, //optional
           icon: const Icon(Icons.chat, color: Colors.white), //optional
           isVisible: true, //optional

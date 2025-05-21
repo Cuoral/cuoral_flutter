@@ -4,10 +4,20 @@ import 'package:flutter/foundation.dart';
 
 class CuoralWidget extends StatefulWidget {
   final String publicKey;
+  final String? firstName;
+  final String? lastName;
+  final String? email;
+
   final bool showWidget;
 
-  CuoralWidget({super.key, required this.publicKey, this.showWidget = true})
-    : assert(publicKey.isNotEmpty, "publicKey must not be empty");
+  CuoralWidget({
+    super.key,
+    required this.publicKey,
+    this.showWidget = true,
+    this.firstName,
+    this.lastName,
+    this.email,
+  }) : assert(publicKey.isNotEmpty, "publicKey must not be empty");
 
   @override
   State<CuoralWidget> createState() => _CuoralWidgetState();
@@ -74,7 +84,7 @@ class _CuoralWidgetState extends State<CuoralWidget> {
     try {
       _webViewController.loadRequest(
         Uri.parse(
-          "https://js.cuoral.com/mobile.html?auto_display=true&key=${widget.publicKey}",
+          "https://js.cuoral.com/mobile.html?auto_display=true&key=${widget.publicKey}&email=${widget.email}&first_name=${widget.firstName}&last_name=${widget.lastName}",
         ),
       );
     } catch (e) {
