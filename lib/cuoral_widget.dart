@@ -1,13 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+// Ensure this is the first import related to InAppWebView
+// ignore_for_file: deprecated_member_use
+
+import 'dart:async';
+
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter/material.dart'; // Other imports can follow
 import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class CuoralWidget extends StatefulWidget {
   final String publicKey;
   final String? firstName;
   final String? lastName;
   final String? email;
-
   final bool showWidget;
 
   CuoralWidget({
@@ -24,83 +29,35 @@ class CuoralWidget extends StatefulWidget {
 }
 
 class _CuoralWidgetState extends State<CuoralWidget> {
-  late WebViewController _webViewController;
+  InAppWebViewController? _webViewController;
   bool _isLoading = true;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _webViewController = WebViewController();
-
-    // Initialize WebView after the widget has been built
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        // Delay JavaScript mode setting to ensure WebView is initialized
-        await _webViewController.setJavaScriptMode(JavaScriptMode.unrestricted);
-        await _webViewController.setNavigationDelegate(
-          NavigationDelegate(
-            onPageStarted: (_) {
-              setState(() {
-                _isLoading = true;
-                _errorMessage = null;
-              });
-            },
-            onPageFinished: (_) {
-              Future.delayed(Duration(seconds: 5), () {
-                // wait for 4 seconds so widget can be fully loaded
-                setState(() {
-                  _isLoading = false;
-                });
-              });
-            },
-            onWebResourceError: (WebResourceError error) {
-              setState(() {
-                _isLoading = false;
-                _errorMessage =
-                    "Error loading Cuoral widget: ${error.description}";
-              });
-              if (kDebugMode) {
-                print("WebView Error: ${error.description}");
-              }
-            },
-            onNavigationRequest: (_) => NavigationDecision.navigate,
-          ),
-        );
-        _loadCuoralWidget();
-      } catch (e) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = "Error initializing WebView: $e";
-        });
-        if (kDebugMode) {
-          print("Error initializing WebView: $e");
-        }
-      }
-    });
+    _requestPermissions();
   }
 
-  void _loadCuoralWidget() {
-    try {
-      _webViewController.loadRequest(
-        Uri.parse(
-          "https://js.cuoral.com/mobile.html?auto_display=true&key=${widget.publicKey}&email=${widget.email}&first_name=${widget.firstName}&last_name=${widget.lastName}",
-        ),
-      );
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = "Failed to load Cuoral widget: $e";
-      });
-      if (kDebugMode) {
-        print("Error loading HTML: $e");
-      }
-    }
+  Future<void> _requestPermissions() async {
+    await Permission.locationWhenInUse.request();
   }
 
   @override
   Widget build(BuildContext context) {
     if (!widget.showWidget) return const SizedBox();
+
+    final Uri cuoralUri = Uri.parse(
+      "https://js.cuoral.com/mobile.html",
+    ).replace(
+      queryParameters: {
+        'auto_display': 'true',
+        'key': widget.publicKey,
+        if (widget.email != null) 'email': widget.email!,
+        if (widget.firstName != null) 'first_name': widget.firstName!,
+        if (widget.lastName != null) 'last_name': widget.lastName!,
+      },
+    );
 
     return Stack(
       children: [
@@ -116,7 +73,95 @@ class _CuoralWidgetState extends State<CuoralWidget> {
           SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            child: WebViewWidget(controller: _webViewController),
+            child: InAppWebView(
+              initialUrlRequest: URLRequest(url: WebUri(cuoralUri.toString())),
+              initialSettings: InAppWebViewSettings(
+                javaScriptEnabled: true,
+                transparentBackground: true,
+                useHybridComposition: true, // Android
+                allowsInlineMediaPlayback: true, // iOS
+                mediaPlaybackRequiresUserGesture: false,
+                domStorageEnabled: true,
+                databaseEnabled: true,
+              ),
+              onWebViewCreated: (controller) {
+                _webViewController = controller;
+              },
+              onLoadStart: (controller, url) {
+                setState(() {
+                  _isLoading = true;
+                  _errorMessage = null;
+                });
+              },
+              onLoadStop: (controller, url) async {
+                setState(() {
+                  _isLoading = false;
+                });
+              },
+              onLoadError: (controller, url, code, message) {
+                setState(() {
+                  _isLoading = false;
+                  _errorMessage =
+                      "Error loading Cuoral widget: $message (Code: $code)";
+                });
+              },
+              onReceivedHttpError: (controller, request, response) {
+                setState(() {
+                  _isLoading = false;
+                  _errorMessage =
+                      "HTTP Error loading Cuoral widget: ${response.statusCode} - ${response.reasonPhrase}";
+                });
+                if (kDebugMode) {
+                  print(
+                    "InAppWebView HTTP Error: ${response.statusCode} - ${response.reasonPhrase}",
+                  );
+                }
+              },
+              onPermissionRequest: (controller, request) async {
+                if (request.resources.contains(
+                  PermissionResourceType.GEOLOCATION,
+                )) {
+                  return Future.value(
+                    PermissionRequestResponse(
+                          resources: [
+                            PermissionResourceType.GEOLOCATION.toString(),
+                          ],
+                          action: PermissionRequestResponseAction.GRANT,
+                        )
+                        as FutureOr<PermissionResponse?>?,
+                  );
+                }
+                return Future.value(
+                  PermissionRequestResponse(
+                        resources:
+                            request.resources
+                                .map((resource) => resource.toString())
+                                .toList(),
+                        action: PermissionRequestResponseAction.DENY,
+                      )
+                      as FutureOr<PermissionResponse?>?,
+                );
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                if (kDebugMode) {
+                  print("WEB CONSOLE: ${consoleMessage.message}");
+                }
+              },
+              onJsPrompt: (controller, jsPromptRequest) async {
+                return JsPromptResponse(message: '');
+              },
+              onGeolocationPermissionsShowPrompt: (controller, origin) async {
+                // No change here, as the syntax is correct.
+                // If it's still failing, it points to deeper environmental issues.
+                return Future.value(
+                  GeolocationPermissionShowPromptResponse(
+                    origin: origin,
+                    allow: true,
+                    retain: true,
+                  ),
+                );
+              },
+            ),
           ),
         if (_isLoading)
           Container(

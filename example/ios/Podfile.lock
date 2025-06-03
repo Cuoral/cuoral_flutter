@@ -2,7 +2,17 @@ PODS:
   - cuoral_flutter (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_inappwebview_ios (0.0.1):
+    - Flutter
+    - flutter_inappwebview_ios/Core (= 0.0.1)
+    - OrderedSet (~> 6.0.3)
+  - flutter_inappwebview_ios/Core (0.0.1):
+    - Flutter
+    - OrderedSet (~> 6.0.3)
   - integration_test (0.0.1):
+    - Flutter
+  - OrderedSet (6.0.3)
+  - permission_handler_apple (9.3.0):
     - Flutter
   - webview_flutter_wkwebview (0.0.1):
     - Flutter
@@ -11,23 +21,36 @@ PODS:
 DEPENDENCIES:
   - cuoral_flutter (from `.symlinks/plugins/cuoral_flutter/ios`)
   - Flutter (from `Flutter`)
+  - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
   - integration_test (from `.symlinks/plugins/integration_test/ios`)
+  - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/darwin`)
+
+SPEC REPOS:
+  trunk:
+    - OrderedSet
 
 EXTERNAL SOURCES:
   cuoral_flutter:
     :path: ".symlinks/plugins/cuoral_flutter/ios"
   Flutter:
     :path: Flutter
+  flutter_inappwebview_ios:
+    :path: ".symlinks/plugins/flutter_inappwebview_ios/ios"
   integration_test:
     :path: ".symlinks/plugins/integration_test/ios"
+  permission_handler_apple:
+    :path: ".symlinks/plugins/permission_handler_apple/ios"
   webview_flutter_wkwebview:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/darwin"
 
 SPEC CHECKSUMS:
   cuoral_flutter: b409db231f0998d57e5519ee151f735621c1fed9
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  flutter_inappwebview_ios: 6f63631e2c62a7c350263b13fa5427aedefe81d4
   integration_test: 252f60fa39af5e17c3aa9899d35d908a0721b573
+  OrderedSet: e539b66b644ff081c73a262d24ad552a69be3a94
+  permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   webview_flutter_wkwebview: a4af96a051138e28e29f60101d094683b9f82188
 
 PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5

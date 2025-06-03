@@ -11,3 +11,8 @@
 ## 0.0.3
 
 * added optional email, first name and last name parameters
+
+
+## 0.0.4
+
+* fix file input issue
