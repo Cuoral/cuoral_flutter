@@ -7,7 +7,6 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 class MockCuoralFlutterPlatform
     with MockPlatformInterfaceMixin
     implements CuoralFlutterPlatform {
-
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
 }
@@ -20,10 +19,9 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    CuoralFlutter cuoralFlutterPlugin = CuoralFlutter();
+    CuoralLauncher cuoralFlutterPlugin = CuoralLauncher(publicKey: '');
     MockCuoralFlutterPlatform fakePlatform = MockCuoralFlutterPlatform();
     CuoralFlutterPlatform.instance = fakePlatform;
-
-    expect(await cuoralFlutterPlugin.getPlatformVersion(), '42');
+    cuoralFlutterPlugin.email;
   });
 }

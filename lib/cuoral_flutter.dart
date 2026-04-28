@@ -1,123 +1,62 @@
-import 'package:cuoral_flutter/cuoral_widget.dart';
-import 'package:flutter/material.dart';
+/// Cuoral Flutter SDK
+///
+/// A comprehensive mobile intelligence and screen recording SDK for Flutter.
+///
+/// Features:
+/// - Customer intelligence tracking (page views, errors, network requests)
+/// - Native crash tracking (Android & iOS)
+/// - Screen recording with audio support
+/// - Automatic error batching and queueing
+///
+/// Usage:
+/// ```dart
+/// void main() {
+///   // Wrap your app with error tracking
+///   CuoralErrorHandler.runApp(() async {
+///     WidgetsFlutterBinding.ensureInitialized();
+///
+///     // Initialize Cuoral
+///     await Cuoral.instance.initialize(
+///       publicKey: 'your-public-key',
+///       email: 'user@example.com',
+///       firstName: 'John',
+///       lastName: 'Doe',
+///     );
+///
+///     runApp(MyApp());
+///   });
+/// }
+///
+/// class MyApp extends StatelessWidget {
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       // Add navigation observer to track screen views
+///       navigatorObservers: [CuoralNavigatorObserver()],
+///       home: HomeScreen(),
+///     );
+///   }
+/// }
+/// ```
+library;
 
-class CuoralLauncher extends StatefulWidget {
-  final String publicKey;
-  final String? email;
-  final String? firstName;
-  final String? lastName;
+// Core SDK
+export 'src/cuoral.dart' show Cuoral;
+export 'src/intelligence.dart' show Intelligence;
+export 'src/event_queue.dart' show EventQueue;
 
-  final Color backgroundColor;
-  final Icon icon;
-  final bool isVisible;
-  final Alignment position;
+// Navigation tracking
+export 'src/cuoral_navigator_observer.dart' show CuoralNavigatorObserver;
 
-  const CuoralLauncher({
-    super.key,
-    required this.publicKey,
-    this.backgroundColor = Colors.blueAccent, // Default background color
-    this.icon = const Icon(Icons.chat), // Default icon
-    this.isVisible = true, // Default to visible
-    this.position = Alignment.bottomRight,
-    this.email,
-    this.firstName,
-    this.lastName, // Default position
-  });
+// Error handling
+export 'src/cuoral_error_handler.dart' show CuoralErrorHandler;
 
-  @override
-  // ignore: library_private_types_in_public_api
-  _CuoralLauncherState createState() => _CuoralLauncherState();
-}
+// Platform interface
+export 'src/cuoral_platform.dart' show CuoralPlatform;
 
-class _CuoralLauncherState extends State<CuoralLauncher> {
-  @override
-  Widget build(BuildContext context) {
-    // Only display the FAB if isVisible is true
-    if (!widget.isVisible) {
-      return const SizedBox();
-    }
+// Widgets
+export 'cuoral_widget.dart' show CuoralWidget;
+export 'cuoral_launcher.dart' show CuoralLauncher;
 
-    return Positioned(
-      bottom: widget.position == Alignment.bottomRight ? 30 : null,
-      right: widget.position == Alignment.bottomRight ? 20 : null,
-      top: widget.position == Alignment.topRight ? 30 : null,
-      left: widget.position == Alignment.topLeft ? 20 : null,
-      child: FloatingActionButton(
-        onPressed: () {
-          _showCuoralModal(context);
-        },
-        child: widget.icon,
-        backgroundColor: widget.backgroundColor,
-      ),
-    );
-  }
-
-  void _showCuoralModal(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Cuoral Chat",
-      pageBuilder: (ctx, anim1, anim2) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: Scaffold(
-            backgroundColor: Colors.black.withOpacity(0.4),
-            body: Center(
-              child: GestureDetector(
-                onTap: () {}, // Prevent tap from closing the modal
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 50.0,
-                  ),
-                  child: Material(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(
-                      12.0,
-                    ), // Rounded corners here
-                    elevation: 10, // Optional: adds a shadow
-                    child: ClipRRect(
-                      // Clip the content to fit within the rounded corners
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            child: CuoralWidget(
-                              publicKey: widget.publicKey,
-                              showWidget: true,
-                              email: widget.email,
-                              firstName: widget.firstName,
-                              lastName: widget.lastName,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () {
-                                Navigator.of(context).pop(); // Close the dialog
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-      transitionDuration: const Duration(milliseconds: 300),
-      transitionBuilder: (ctx, anim1, anim2, child) {
-        return FadeTransition(opacity: anim1, child: child);
-      },
-    );
-  }
-}
+/// Version information
+const String version = '0.0.5';

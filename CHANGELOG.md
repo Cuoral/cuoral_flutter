@@ -16,3 +16,16 @@
 ## 0.0.4
 
 * fix file input issue
+
+
+## 0.0.5
+
+* Full customer intelligence tracking (page views, console errors, network errors, custom events)
+* Automatic event batching and queueing
+* Native crash tracking (Android & iOS) with deduplication
+* Screen recording support (Android MediaProjection, iOS ReplayKit)
+* Automatic HTTP interception for network error tracking
+* Session persistence with 30-day expiry
+* Navigation observer with dialog/popup filtering
+* Profile setting integration
+* Graceful 502/504 degradation
