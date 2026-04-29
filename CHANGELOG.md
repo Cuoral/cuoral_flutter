@@ -28,4 +28,10 @@
 * Session persistence with 30-day expiry
 * Navigation observer with dialog/popup filtering
 * Profile setting integration
+
+
+## 0.0.6
+
+* Auto-detect page widget names for MaterialPageRoute without named routes
+* Improved navigation tracking for unnamed route patterns
 * Graceful 502/504 degradation
