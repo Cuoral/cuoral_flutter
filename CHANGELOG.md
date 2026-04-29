@@ -34,4 +34,10 @@
 
 * Auto-detect page widget names for MaterialPageRoute without named routes
 * Improved navigation tracking for unnamed route patterns
+
+
+## 0.0.7
+
+* Fix page name detection timing for unnamed MaterialPageRoute
+* Defer widget tree inspection to post-frame callback for reliability
 * Graceful 502/504 degradation

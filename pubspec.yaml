@@ -1,11 +1,11 @@
 name: cuoral_flutter
 description: "A Flutter plugin to integrate Cuoral SDK for customer support and engagement."
-version: 0.0.6
+version: 0.0.7
 homepage: https://github.com/cuoral/cuoral_flutter.git
 
 environment:
   sdk: ^3.7.0
-  flutter: '>=3.3.0'
+  flutter: ">=3.3.0"
 
 dependencies:
   flutter:
@@ -18,12 +18,10 @@ dependencies:
   path_provider:
   shared_preferences: ^2.2.2
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
- 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -53,7 +51,6 @@ flutter:
         pluginClass: CuoralFlutterPlugin
       windows:
         pluginClass: CuoralFlutterPluginCApi
-
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'cuoral.dart';
 
 /// Navigator observer that automatically tracks screen navigation
@@ -38,12 +39,26 @@ class CuoralNavigatorObserver extends NavigatorObserver {
   void _trackRoute(Route<dynamic> route) {
     if (_shouldSkipRoute(route)) return;
 
-    final screenName = _getScreenName(route);
-    if (!_isValidScreenName(screenName)) return;
+    // Check if we already have a name (named route)
+    if (route.settings.name != null &&
+        route.settings.name!.isNotEmpty &&
+        _isValidScreenName(route.settings.name!)) {
+      _reportPageView(route.settings.name!);
+      return;
+    }
 
+    // For unnamed routes, defer until after the frame is built
+    // so the widget tree is available for inspection
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      final screenName = _getScreenName(route);
+      if (!_isValidScreenName(screenName)) return;
+      _reportPageView(screenName);
+    });
+  }
+
+  void _reportPageView(String screenName) {
     final referrer = _lastValidScreen;
     _lastValidScreen = screenName;
-
     Cuoral.instance.trackPageView(screenName, referrer: referrer);
   }
 

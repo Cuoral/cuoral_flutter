@@ -59,4 +59,4 @@ export 'cuoral_widget.dart' show CuoralWidget;
 export 'cuoral_launcher.dart' show CuoralLauncher;
 
 /// Version information
-const String version = '0.0.6';
+const String version = '0.0.7';
