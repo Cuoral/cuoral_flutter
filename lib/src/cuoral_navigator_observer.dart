@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'cuoral.dart';
@@ -42,6 +43,7 @@ class CuoralNavigatorObserver extends NavigatorObserver {
     // Check if we already have a name (named route)
     if (route.settings.name != null &&
         route.settings.name!.isNotEmpty &&
+        route.settings.name != 'null' &&
         _isValidScreenName(route.settings.name!)) {
       _reportPageView(route.settings.name!);
       return;
@@ -51,8 +53,18 @@ class CuoralNavigatorObserver extends NavigatorObserver {
     // so the widget tree is available for inspection
     SchedulerBinding.instance.addPostFrameCallback((_) {
       final screenName = _getScreenName(route);
-      if (!_isValidScreenName(screenName)) return;
-      _reportPageView(screenName);
+      if (_isValidScreenName(screenName) && screenName != '/page') {
+        _reportPageView(screenName);
+        return;
+      }
+
+      // If still /page, the widget tree might not be ready yet.
+      // Try once more after a short delay (route animation completing)
+      Future.delayed(const Duration(milliseconds: 300), () {
+        final retryName = _getScreenName(route);
+        if (!_isValidScreenName(retryName)) return;
+        _reportPageView(retryName);
+      });
     });
   }
 
@@ -111,12 +123,12 @@ class CuoralNavigatorObserver extends NavigatorObserver {
     // 1. Use named route if available
     if (route.settings.name != null &&
         route.settings.name!.isNotEmpty &&
+        route.settings.name != 'null' &&
         _isValidScreenName(route.settings.name!)) {
       return route.settings.name!;
     }
 
-    // 2. For MaterialPageRoute/CupertinoPageRoute without named routes,
-    //    try to extract the page widget class name from settings arguments or route toString
+    // 2. For MaterialPageRoute without named routes, walk the widget tree
     if (route is ModalRoute) {
       final pageName = _extractPageName(route);
       if (pageName != null) {
@@ -124,6 +136,7 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       }
     }
 
+    // 3. Fallback: route type
     final routeType = route.runtimeType.toString();
     var cleanType = routeType;
     final genericStart = routeType.indexOf('<');
@@ -148,34 +161,56 @@ class CuoralNavigatorObserver extends NavigatorObserver {
     return '/${cleanType.toLowerCase()}';
   }
 
-  /// Try to extract meaningful page name from a route
-  /// Works with MaterialPageRoute(builder: (_) => MyScreen()) pattern
+  /// Extract the page widget name from the route's widget tree
   String? _extractPageName(ModalRoute<dynamic> route) {
     try {
-      // Get the current widget being displayed by the route
+      // Strategy 1: Walk the widget tree (works after frame is built)
       final subtreeContext = route.subtreeContext;
       if (subtreeContext != null) {
-        // Walk up to find the page widget (skip framework widgets)
-        Element? pageElement;
-        subtreeContext.visitChildElements((element) {
-          if (pageElement != null) return;
-          _findPageWidget(element, (found) {
-            pageElement = found;
-          });
-        });
-
-        if (pageElement != null) {
-          final widgetName = pageElement!.widget.runtimeType.toString();
-          if (_isValidScreenName(widgetName) && widgetName != 'Builder') {
-            return _toSnakeCase(widgetName);
+        String? result;
+        
+        void visitor(Element element) {
+          if (result != null) return;
+          
+          final widgetName = element.widget.runtimeType.toString();
+          
+          // Skip private/internal framework widgets
+          if (widgetName.startsWith('_')) {
+            element.visitChildElements(visitor);
+            return;
+          }
+          
+          // Skip known framework wrapper widgets
+          if (_isFrameworkWidget(widgetName)) {
+            element.visitChildElements(visitor);
+            return;
+          }
+          
+          // Found a user widget - use it
+          if (_isValidScreenName(widgetName)) {
+            result = _toSnakeCase(widgetName);
           }
         }
+        
+        subtreeContext.visitChildElements(visitor);
+        if (result != null) return result;
       }
 
-      // Fallback: check route.settings.arguments for a screen name
+      // Strategy 2: Check route.settings.arguments for a screen name
       final args = route.settings.arguments;
       if (args is Map && args.containsKey('screenName')) {
         return args['screenName'].toString();
+      }
+
+      // Strategy 3: Try to parse route.toString() for page type info
+      // MaterialPageRoute often contains the page name in its string representation
+      final routeString = route.toString();
+      final match = RegExp(r'→\s*(\w+)').firstMatch(routeString);
+      if (match != null) {
+        final pageName = match.group(1)!;
+        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+          return _toSnakeCase(pageName);
+        }
       }
     } catch (_) {
       // Fail silently
@@ -183,32 +218,79 @@ class CuoralNavigatorObserver extends NavigatorObserver {
     return null;
   }
 
-  /// Recursively find the first non-framework widget (the page widget)
-  void _findPageWidget(Element element, void Function(Element) onFound) {
-    final widgetName = element.widget.runtimeType.toString();
-
-    // Skip framework/internal widgets
-    if (widgetName.startsWith('_') ||
-        widgetName == 'Builder' ||
-        widgetName == 'Semantics' ||
-        widgetName == 'Actions' ||
-        widgetName == 'FocusScope' ||
-        widgetName == 'PageStorage' ||
-        widgetName == 'Offstage' ||
-        widgetName == 'AnimatedBuilder' ||
-        widgetName == 'FadeTransition' ||
-        widgetName == 'FractionalTranslation' ||
-        widgetName == 'SlideTransition' ||
-        widgetName == 'RepaintBoundary') {
-      // Keep looking deeper
-      element.visitChildElements((child) {
-        _findPageWidget(child, onFound);
-      });
-      return;
-    }
-
-    // Found a user widget
-    onFound(element);
+  /// Check if a widget name is a known framework widget
+  bool _isFrameworkWidget(String name) {
+    const frameworkWidgets = {
+      'Builder',
+      'Semantics',
+      'Actions',
+      'FocusScope',
+      'FocusTraversalGroup',
+      'PageStorage',
+      'Offstage',
+      'AnimatedBuilder',
+      'FadeTransition',
+      'FractionalTranslation',
+      'SlideTransition',
+      'RepaintBoundary',
+      'Scaffold',
+      'Material',
+      'AnimatedPhysicalModel',
+      'NotificationListener',
+      'InheritedTheme',
+      'IconTheme',
+      'DefaultTextStyle',
+      'CustomScrollView',
+      'Scrollable',
+      'ScrollNotificationObserver',
+      'MediaQuery',
+      'LayoutId',
+      'CustomMultiChildLayout',
+      'AnimatedDefaultTextStyle',
+      'UnmanagedRestorationScope',
+      'RestorationScope',
+      'HeroControllerScope',
+      'ScrollConfiguration',
+      'PrimaryScrollController',
+      'SafeArea',
+      'Padding',
+      'SizedBox',
+      'Center',
+      'Align',
+      'Container',
+      'DecoratedBox',
+      'ColoredBox',
+      'ConstrainedBox',
+      'LimitedBox',
+      'Expanded',
+      'Flexible',
+      'Column',
+      'Row',
+      'Stack',
+      'Positioned',
+      'ListView',
+      'SingleChildScrollView',
+      'ClipRect',
+      'ClipRRect',
+      'ClipPath',
+      'Transform',
+      'Opacity',
+      'SliverList',
+      'SliverPadding',
+      'SliverFillRemaining',
+      'KeyedSubtree',
+      'TickerMode',
+      'AbsorbPointer',
+      'IgnorePointer',
+      'BlockSemantics',
+      'ExcludeSemantics',
+      'MergeSemantics',
+      'Listener',
+      'GestureDetector',
+      'InkWell',
+      'Visibility',
+    };
+    return frameworkWidgets.contains(name);
   }
 
   /// Convert PascalCase to snake_case: "HomeScreen" → "home_screen"

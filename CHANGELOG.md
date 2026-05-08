@@ -40,4 +40,12 @@
 
 * Fix page name detection timing for unnamed MaterialPageRoute
 * Defer widget tree inspection to post-frame callback for reliability
+
+
+## 0.0.8
+
+* Fix page name detection for unnamed MaterialPageRoute (was showing /page)
+* Expanded framework widget skip list for more reliable page name extraction
+* Added retry mechanism for widget tree inspection during route animations
+* Added route.toString() parsing as fallback strategy
 * Graceful 502/504 degradation
