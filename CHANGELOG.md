@@ -1,3 +1,9 @@
+## 0.1.1
+
+* Fixed overlay positioning to use rootOverlay, preventing host app's bottom nav from blocking chat tabs
+* Chat overlay now properly covers entire screen including host app navigation bars
+
+
 ## 0.1.0
 
 * Persistent WebView overlay for instant re-opens without reload

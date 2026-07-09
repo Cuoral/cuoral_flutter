@@ -82,7 +82,7 @@ class CuoralOverlay {
             ),
       );
 
-      Overlay.of(context).insert(_overlayEntry!);
+      Overlay.of(context, rootOverlay: true).insert(_overlayEntry!);
       _isInitialized = true;
     }
 

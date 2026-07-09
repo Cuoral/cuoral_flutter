@@ -48,6 +48,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _isRecording = false;
   String? _recordingPath;
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -56,28 +57,90 @@ class _HomeScreenState extends State<HomeScreen> {
         Scaffold(
           appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: const Text('Cuoral Flutter Demo'),
+            title: Text(_getTitle()),
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // SDK Status
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'SDK Status',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+          body: _getBody(),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: 'Profile',
+              ),
+            ],
+          ),
+        ),
+        // Cuoral Chat Launcher Button
+        CuoralLauncher(
+          publicKey: 'c8e3081e-8dfc-49b5-bbd1-4ef513504d88',
+          email: 'demo@example.com',
+          firstName: 'Demo',
+          lastName: 'User',
+        ),
+      ],
+    );
+  }
+
+  String _getTitle() {
+    switch (_selectedIndex) {
+      case 0:
+        return 'Cuoral Flutter Demo';
+      case 1:
+        return 'Settings';
+      case 2:
+        return 'Profile';
+      default:
+        return 'Cuoral Flutter Demo';
+    }
+  }
+
+  Widget _getBody() {
+    switch (_selectedIndex) {
+      case 0:
+        return _buildHomeTab();
+      case 1:
+        return _buildSettingsTab();
+      case 2:
+        return _buildProfileTab();
+      default:
+        return _buildHomeTab();
+    }
+  }
+
+  Widget _buildHomeTab() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // SDK Status
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'SDK Status',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                           const SizedBox(height: 8),
                           Text('Initialized: ${Cuoral.instance.isInitialized}'),
                           Text(
@@ -243,21 +306,43 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
-          ),
-        ),
+          );
+  }
 
-        // Add the Cuoral chat launcher floating button
-        CuoralLauncher(
-          publicKey: 'c8e3081e-8dfc-49b5-bbd1-4ef513504d88',
-          email: 'demo@example.com',
-          firstName: 'Demo',
-          lastName: 'User',
-          backgroundColor: Colors.red,
-          icon: const Icon(Icons.chat, color: Colors.white),
-          isVisible: true,
-          position: Alignment.bottomRight,
-        ),
-      ],
+  Widget _buildSettingsTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.settings, size: 80, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'Settings',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text('This is the settings tab'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileTab() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.person, size: 80, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'Profile',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text('Demo User'),
+          const Text('demo@example.com'),
+        ],
+      ),
     );
   }
 
