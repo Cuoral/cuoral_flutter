@@ -226,6 +226,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     'Look for the floating chat button in the bottom-right corner!',
                     style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
                   ),
+                  const SizedBox(height: 8),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      CuoralLauncher.open(
+                        context,
+                        publicKey: 'c8e3081e-8dfc-49b5-bbd1-4ef513504d88',
+                        email: 'demo@example.com',
+                        firstName: 'Demo',
+                        lastName: 'User',
+                      );
+                    },
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: const Text('Open Chat (Programmatic)'),
+                  ),
                 ],
               ),
             ),

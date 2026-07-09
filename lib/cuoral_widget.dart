@@ -93,6 +93,11 @@ class _CuoralWidgetState extends State<CuoralWidget> {
                 mediaPlaybackRequiresUserGesture: false,
                 domStorageEnabled: true,
                 databaseEnabled: true,
+                supportZoom: false,
+                builtInZoomControls: false,
+                displayZoomControls: false,
+                minimumZoomScale: 1.0,
+                maximumZoomScale: 1.0,
               ),
               onWebViewCreated: (controller) {
                 // Handler for setting session ID from WebView

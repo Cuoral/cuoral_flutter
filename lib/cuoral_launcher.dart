@@ -1,9 +1,10 @@
-import 'package:cuoral_flutter/cuoral_widget.dart';
 import 'package:flutter/material.dart';
+import 'src/cuoral_overlay.dart';
 
 /// Cuoral chat launcher widget
 ///
 /// Displays a floating action button that opens the Cuoral chat interface.
+/// Uses [CuoralOverlay] for smooth slide-up animation and pre-warmed WebView.
 class CuoralLauncher extends StatefulWidget {
   final String publicKey;
   final String? email;
@@ -29,8 +30,8 @@ class CuoralLauncher extends StatefulWidget {
 
   /// Open the Cuoral chat programmatically from anywhere.
   ///
-  /// Use this when you want to open the chat from a custom button,
-  /// a dedicated screen, or any user action.
+  /// Uses a smooth slide-up animation with a pre-warmed WebView.
+  /// The WebView stays cached for 30 minutes for instant re-opens.
   ///
   /// Example:
   /// ```dart
@@ -52,68 +53,18 @@ class CuoralLauncher extends StatefulWidget {
     String? firstName,
     String? lastName,
   }) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Cuoral Chat",
-      pageBuilder: (ctx, anim1, anim2) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: Scaffold(
-            backgroundColor: Colors.black.withValues(alpha: 0.4),
-            body: Center(
-              child: GestureDetector(
-                onTap: () {},
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 50.0,
-                  ),
-                  child: Material(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.0),
-                    elevation: 10,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            child: CuoralWidget(
-                              publicKey: publicKey,
-                              showWidget: true,
-                              email: email,
-                              firstName: firstName,
-                              lastName: lastName,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.close,
-                                color: Colors.black,
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+    CuoralOverlay.instance.show(
+      context,
+      publicKey: publicKey,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
     );
+  }
+
+  /// Close the Cuoral chat overlay programmatically.
+  static void close() {
+    CuoralOverlay.instance.hide();
   }
 
   @override
@@ -134,76 +85,17 @@ class _CuoralLauncherState extends State<CuoralLauncher> {
       left: widget.position == Alignment.topLeft ? 20 : null,
       child: FloatingActionButton(
         onPressed: () {
-          _showCuoralModal(context);
+          CuoralOverlay.instance.show(
+            context,
+            publicKey: widget.publicKey,
+            email: widget.email,
+            firstName: widget.firstName,
+            lastName: widget.lastName,
+          );
         },
         backgroundColor: widget.backgroundColor,
         child: widget.icon,
       ),
-    );
-  }
-
-  void _showCuoralModal(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: "Cuoral Chat",
-      pageBuilder: (ctx, anim1, anim2) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: Scaffold(
-            backgroundColor: Colors.black.withValues(alpha: 0.4),
-            body: Center(
-              child: GestureDetector(
-                onTap: () {},
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 50.0,
-                  ),
-                  child: Material(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.0),
-                    elevation: 10,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12.0),
-                      child: Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height,
-                            child: CuoralWidget(
-                              publicKey: widget.publicKey,
-                              showWidget: true,
-                              email: widget.email,
-                              firstName: widget.firstName,
-                              lastName: widget.lastName,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.close,
-                                color: Colors.black,
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 }

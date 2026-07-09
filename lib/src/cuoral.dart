@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'intelligence.dart';
 import 'cuoral_http_overrides.dart';
 import 'cuoral_platform.dart';
+import 'cuoral_overlay.dart';
 
 /// Main Cuoral SDK class for Flutter applications
 ///
@@ -162,10 +163,17 @@ class Cuoral {
             publicKey: _publicKey!,
             sessionId: _sessionId ?? '',
           );
-
         } catch (e) {
           // Fail silently
         }
+
+        // Pre-warm the chat overlay WebView for instant display
+        CuoralOverlay.instance.preWarm(
+          publicKey: _publicKey!,
+          email: _email,
+          firstName: _firstName,
+          lastName: _lastName,
+        );
 
         _isInitialized = true;
         return true;
@@ -322,7 +330,6 @@ class Cuoral {
           }
         }
       }
-
     } catch (e) {
       // Storage failure - continue without persisted session
     }
@@ -468,7 +475,6 @@ class Cuoral {
       };
 
       await prefs.setString(_storageKey, jsonEncode(sessionData));
-
     } catch (e) {
       // Storage failure is not critical
     }

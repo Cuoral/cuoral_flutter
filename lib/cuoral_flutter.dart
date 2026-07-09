@@ -57,6 +57,7 @@ export 'src/cuoral_platform.dart' show CuoralPlatform;
 // Widgets
 export 'cuoral_widget.dart' show CuoralWidget;
 export 'cuoral_launcher.dart' show CuoralLauncher;
+export 'src/cuoral_overlay.dart' show CuoralOverlay;
 
 /// Version information
-const String version = '0.0.9';
+const String version = '0.1.0';

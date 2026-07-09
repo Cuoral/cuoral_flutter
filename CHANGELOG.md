@@ -1,3 +1,13 @@
+## 0.1.0
+
+* Persistent WebView overlay for instant re-opens without reload
+* Smooth slide-up/slide-down animations (300ms)
+* Fixed navigation errors when closing chat widget
+* Disabled WebView zoom on keyboard input
+* Improved floating close button design (smaller, circular)
+* CuoralOverlay singleton pattern for memory efficiency
+
+
 ## 0.0.1
 
 * First release of cuoral flutter SDK
