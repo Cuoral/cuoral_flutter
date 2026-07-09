@@ -48,4 +48,9 @@
 * Expanded framework widget skip list for more reliable page name extraction
 * Added retry mechanism for widget tree inspection during route animations
 * Added route.toString() parsing as fallback strategy
+
+
+## 0.0.9
+
+* Added CuoralLauncher.open() static method for programmatic widget opening
 * Graceful 502/504 degradation

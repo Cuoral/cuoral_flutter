@@ -432,6 +432,50 @@ CuoralWidget(
 )
 ```
 
+### Programmatic Opening
+
+Open the chat from any button, menu item, or user action — no need to place a widget in the tree:
+
+```dart
+// From a custom button
+ElevatedButton(
+  onPressed: () {
+    CuoralLauncher.open(
+      context,
+      publicKey: 'your-public-key',
+      email: 'user@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
+    );
+  },
+  child: Text('Contact Support'),
+);
+```
+
+Works from anywhere — a dedicated support screen, a settings page, an error state, etc:
+
+```dart
+// From a dedicated support screen
+class SupportScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Help & Support')),
+      body: Center(
+        child: ElevatedButton.icon(
+          icon: Icon(Icons.chat),
+          label: Text('Chat with us'),
+          onPressed: () => CuoralLauncher.open(
+            context,
+            publicKey: 'your-public-key',
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
 ---
 
 ## Session Management
