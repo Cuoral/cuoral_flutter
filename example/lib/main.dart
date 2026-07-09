@@ -68,10 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
-              ),
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),
                 label: 'Settings',
@@ -141,172 +138,170 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                          const SizedBox(height: 8),
-                          Text('Initialized: ${Cuoral.instance.isInitialized}'),
-                          Text(
-                            'Session ID: ${Cuoral.instance.sessionId ?? "N/A"}',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Intelligence Tracking Demos
-                  const Text(
-                    'Intelligence Tracking',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  ElevatedButton(
-                    onPressed: () {
-                      // Manual page view tracking
-                      Cuoral.instance.trackPageView('/demo_screen');
-                      _showSnackBar('Page view tracked');
-                    },
-                    child: const Text('Track Page View'),
-                  ),
-
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Test error tracking
-                      try {
-                        throw Exception('This is a test error');
-                      } catch (e, stackTrace) {
-                        await CuoralErrorHandler.trackError(
-                          e,
-                          stackTrace,
-                          context: 'demo_button',
-                        );
-                        _showSnackBar('Error tracked');
-                      }
-                    },
-                    child: const Text('Track Test Error'),
-                  ),
-
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Test automatic network error tracking
-                      // No need to use special HTTP client - ALL requests are tracked automatically
-                      final client = HttpClient();
-                      try {
-                        final request = await client.getUrl(
-                          Uri.parse('https://httpstat.us/404'),
-                        );
-                        final response = await request.close();
-                        _showSnackBar(
-                          'Network error automatically tracked (${response.statusCode})',
-                        );
-                      } catch (e) {
-                        _showSnackBar('Network error tracked: $e');
-                      } finally {
-                        client.close();
-                      }
-                    },
-                    child: const Text('Test Auto Network Tracking (404)'),
-                  ),
-
-                  ElevatedButton(
-                    onPressed: () async {
-                      // Track a custom event
-                      await Cuoral.instance.trackCustomEvent(
-                        name: 'demo_button_clicked',
-                        category: 'user_action',
-                        properties: {
-                          'button_name': 'Custom Event Demo',
-                          'screen': 'home',
-                          'timestamp': DateTime.now().toIso8601String(),
-                        },
-                        elementSelector: 'demo_custom_event_button',
-                      );
-                      _showSnackBar('Custom event tracked');
-                    },
-                    child: const Text('Track Custom Event'),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Screen Recording Demo
-                  const Text(
-                    'Screen Recording',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-
-                  ElevatedButton(
-                    onPressed: _isRecording ? null : _startRecording,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Start Recording'),
-                  ),
-
-                  ElevatedButton(
-                    onPressed: _isRecording ? _stopRecording : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                    ),
-                    child: const Text('Stop Recording'),
-                  ),
-
-                  if (_recordingPath != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        'Last recording: $_recordingPath',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ),
-
-                  const SizedBox(height: 16),
-
-                  // Navigation Demo
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SecondScreen(),
-                          settings: const RouteSettings(name: '/second_screen'),
-                        ),
-                      );
-                    },
-                    child: const Text('Navigate to Second Screen'),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Cuoral Chat Widget Demo
-                  const Text(
-                    'Chat Widget',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Look for the floating chat button in the bottom-right corner!',
-                    style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                  ),
-                  const SizedBox(height: 8),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      CuoralLauncher.open(
-                        context,
-                        publicKey: 'c8e3081e-8dfc-49b5-bbd1-4ef513504d88',
-                        email: 'demo@example.com',
-                        firstName: 'Demo',
-                        lastName: 'User',
-                      );
-                    },
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: const Text('Open Chat (Programmatic)'),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text('Initialized: ${Cuoral.instance.isInitialized}'),
+                    Text('Session ID: ${Cuoral.instance.sessionId ?? "N/A"}'),
+                  ],
+                ),
               ),
             ),
-          );
+            const SizedBox(height: 16),
+
+            // Intelligence Tracking Demos
+            const Text(
+              'Intelligence Tracking',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+
+            ElevatedButton(
+              onPressed: () {
+                // Manual page view tracking
+                Cuoral.instance.trackPageView('/demo_screen');
+                _showSnackBar('Page view tracked');
+              },
+              child: const Text('Track Page View'),
+            ),
+
+            ElevatedButton(
+              onPressed: () async {
+                // Test error tracking
+                try {
+                  throw Exception('This is a test error');
+                } catch (e, stackTrace) {
+                  await CuoralErrorHandler.trackError(
+                    e,
+                    stackTrace,
+                    context: 'demo_button',
+                  );
+                  _showSnackBar('Error tracked');
+                }
+              },
+              child: const Text('Track Test Error'),
+            ),
+
+            ElevatedButton(
+              onPressed: () async {
+                // Test automatic network error tracking
+                // No need to use special HTTP client - ALL requests are tracked automatically
+                final client = HttpClient();
+                try {
+                  final request = await client.getUrl(
+                    Uri.parse('https://httpstat.us/404'),
+                  );
+                  final response = await request.close();
+                  _showSnackBar(
+                    'Network error automatically tracked (${response.statusCode})',
+                  );
+                } catch (e) {
+                  _showSnackBar('Network error tracked: $e');
+                } finally {
+                  client.close();
+                }
+              },
+              child: const Text('Test Auto Network Tracking (404)'),
+            ),
+
+            ElevatedButton(
+              onPressed: () async {
+                // Track a custom event
+                await Cuoral.instance.trackCustomEvent(
+                  name: 'demo_button_clicked',
+                  category: 'user_action',
+                  properties: {
+                    'button_name': 'Custom Event Demo',
+                    'screen': 'home',
+                    'timestamp': DateTime.now().toIso8601String(),
+                  },
+                  elementSelector: 'demo_custom_event_button',
+                );
+                _showSnackBar('Custom event tracked');
+              },
+              child: const Text('Track Custom Event'),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Screen Recording Demo
+            const Text(
+              'Screen Recording',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+
+            ElevatedButton(
+              onPressed: _isRecording ? null : _startRecording,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Start Recording'),
+            ),
+
+            ElevatedButton(
+              onPressed: _isRecording ? _stopRecording : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Stop Recording'),
+            ),
+
+            if (_recordingPath != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  'Last recording: $_recordingPath',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+
+            const SizedBox(height: 16),
+
+            // Navigation Demo
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SecondScreen(),
+                    settings: const RouteSettings(name: '/second_screen'),
+                  ),
+                );
+              },
+              child: const Text('Navigate to Second Screen'),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Cuoral Chat Widget Demo
+            const Text(
+              'Chat Widget',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Look for the floating chat button in the bottom-right corner!',
+              style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: () {
+                CuoralLauncher.open(
+                  context,
+                  publicKey: 'c8e3081e-8dfc-49b5-bbd1-4ef513504d88',
+                  email: 'demo@example.com',
+                  firstName: 'Demo',
+                  lastName: 'User',
+                );
+              },
+              icon: const Icon(Icons.chat_bubble_outline),
+              label: const Text('Open Chat (Programmatic)'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildSettingsTab() {
