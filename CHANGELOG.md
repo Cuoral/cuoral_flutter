@@ -1,3 +1,9 @@
+## 0.1.3
+
+* Fixed WebView scroll issues by adding gesture recognizers for vertical and horizontal drag
+* Improved touch and scroll responsiveness within the chat widget
+
+
 ## 0.1.2
 
 * Fixed close button icon color to always be visible (black87) against white background

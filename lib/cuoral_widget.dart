@@ -7,6 +7,8 @@ import 'dart:io';
 
 import 'package:cuoral_flutter/cuoral_flutter.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart'; // Other imports can follow
 import 'package:permission_handler/permission_handler.dart';
 
@@ -84,6 +86,14 @@ class _CuoralWidgetState extends State<CuoralWidget> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             child: InAppWebView(
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<VerticalDragGestureRecognizer>(
+                  () => VerticalDragGestureRecognizer(),
+                ),
+                Factory<HorizontalDragGestureRecognizer>(
+                  () => HorizontalDragGestureRecognizer(),
+                ),
+              },
               initialUrlRequest: URLRequest(url: WebUri(cuoralUri.toString())),
               initialSettings: InAppWebViewSettings(
                 javaScriptEnabled: true,
