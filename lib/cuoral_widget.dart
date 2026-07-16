@@ -405,8 +405,8 @@ class _CuoralWidgetState extends State<CuoralWidget> {
               onReceivedServerTrustAuthRequest: (controller, challenge) async {
                 // Automatically accept SSL certificates for Cuoral domains
                 final host = challenge.protectionSpace.host;
-                if (host == 'js.cuoral.com' || 
-                    host == 'api.cuoral.com' || 
+                if (host == 'js.cuoral.com' ||
+                    host == 'api.cuoral.com' ||
                     host == 'wss.cuoral.com') {
                   return ServerTrustAuthResponse(
                     action: ServerTrustAuthResponseAction.PROCEED,

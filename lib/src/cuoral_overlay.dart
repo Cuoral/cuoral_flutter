@@ -240,7 +240,11 @@ class _CuoralOverlayWidgetState extends State<_CuoralOverlayWidget>
                           shape: const CircleBorder(),
                           elevation: 2,
                           child: IconButton(
-                            icon: const Icon(Icons.close, size: 18, color: Colors.black87),
+                            icon: const Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Colors.black87,
+                            ),
                             onPressed: widget.onClose,
                             padding: const EdgeInsets.all(3),
                             constraints: const BoxConstraints(
