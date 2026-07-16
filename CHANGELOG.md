@@ -1,3 +1,21 @@
+## 0.1.2
+
+* Fixed close button icon color to always be visible (black87) against white background
+* Added automatic SSL certificate handling for Cuoral domains to prevent hanging/delays
+* Added WebView caching with LOAD_DEFAULT mode (respects server cache-control headers)
+* Enabled third-party cookies and shared cookies for better API communication
+* Performance optimizations while allowing quick updates via server cache headers
+
+
+## 0.1.1
+
+* Fixed close button icon color to always be visible (black87) against white background
+* Added automatic SSL certificate handling for Cuoral domains to prevent hanging/delays
+* Added WebView caching with LOAD_DEFAULT mode (respects server cache-control headers)
+* Enabled third-party cookies and shared cookies for better API communication
+* Performance optimizations while allowing quick updates via server cache headers
+
+
 ## 0.1.1
 
 * Fixed overlay positioning to use rootOverlay, preventing host app's bottom nav from blocking chat tabs

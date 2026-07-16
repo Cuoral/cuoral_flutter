@@ -98,6 +98,12 @@ class _CuoralWidgetState extends State<CuoralWidget> {
                 displayZoomControls: false,
                 minimumZoomScale: 1.0,
                 maximumZoomScale: 1.0,
+                // Performance optimizations
+                cacheEnabled: true,
+                cacheMode: CacheMode.LOAD_DEFAULT,
+                incognito: false,
+                thirdPartyCookiesEnabled: true,
+                sharedCookiesEnabled: true,
               ),
               onWebViewCreated: (controller) {
                 // Handler for setting session ID from WebView
@@ -395,6 +401,20 @@ class _CuoralWidgetState extends State<CuoralWidget> {
                   _errorMessage =
                       "HTTP Error loading Cuoral widget: ${response.statusCode} - ${response.reasonPhrase}";
                 });
+              },
+              onReceivedServerTrustAuthRequest: (controller, challenge) async {
+                // Automatically accept SSL certificates for Cuoral domains
+                final host = challenge.protectionSpace.host;
+                if (host == 'js.cuoral.com' || 
+                    host == 'api.cuoral.com' || 
+                    host == 'wss.cuoral.com') {
+                  return ServerTrustAuthResponse(
+                    action: ServerTrustAuthResponseAction.PROCEED,
+                  );
+                }
+                return ServerTrustAuthResponse(
+                  action: ServerTrustAuthResponseAction.CANCEL,
+                );
               },
               onPermissionRequest: (controller, request) async {
                 if (request.resources.contains(
