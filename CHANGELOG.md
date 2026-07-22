@@ -1,3 +1,12 @@
+## 0.1.4
+
+* Enhanced unnamed route detection with deep widget tree traversal (up to 20 levels)
+* Smart prioritization of user-defined widgets over framework widgets
+* Expanded framework widget filtering (80+ Flutter widgets)
+* Improved detection for wrapped, nested, and generic widget class names
+* Better handling of MaterialPageRoute without RouteSettings names
+
+
 ## 0.1.3
 
 * Fixed WebView scroll issues by adding gesture recognizers for vertical and horizontal drag

@@ -164,53 +164,96 @@ class CuoralNavigatorObserver extends NavigatorObserver {
   /// Extract the page widget name from the route's widget tree
   String? _extractPageName(ModalRoute<dynamic> route) {
     try {
-      // Strategy 1: Walk the widget tree (works after frame is built)
+      // Strategy 1: Deep widget tree traversal (works after frame is built)
       final subtreeContext = route.subtreeContext;
       if (subtreeContext != null) {
-        String? result;
+        final candidates = <String>[];
         
-        void visitor(Element element) {
-          if (result != null) return;
+        // Deep traversal to collect ALL potential user widgets
+        void visitor(Element element, int depth) {
+          if (depth > 20) return; // Prevent infinite loops
           
           final widgetName = element.widget.runtimeType.toString();
           
           // Skip private/internal framework widgets
-          if (widgetName.startsWith('_')) {
-            element.visitChildElements(visitor);
-            return;
+          if (!widgetName.startsWith('_') && 
+              !_isFrameworkWidget(widgetName) &&
+              _isValidScreenName(widgetName)) {
+            candidates.add(widgetName);
           }
           
-          // Skip known framework wrapper widgets
-          if (_isFrameworkWidget(widgetName)) {
-            element.visitChildElements(visitor);
-            return;
-          }
-          
-          // Found a user widget - use it
-          if (_isValidScreenName(widgetName)) {
-            result = _toSnakeCase(widgetName);
-          }
+          // Continue traversing children
+          element.visitChildElements((child) => visitor(child, depth + 1));
         }
         
-        subtreeContext.visitChildElements(visitor);
-        if (result != null) return result;
+        subtreeContext.visitChildElements((e) => visitor(e, 0));
+        
+        // Pick the best candidate (prefer user widgets with common suffixes)
+        if (candidates.isNotEmpty) {
+          // Priority 1: Widgets ending with Screen, Page, View, Widget
+          for (final candidate in candidates) {
+            if (candidate.endsWith('Screen') || 
+                candidate.endsWith('Page') || 
+                candidate.endsWith('View') ||
+                candidate.endsWith('Widget')) {
+              return _toSnakeCase(candidate);
+            }
+          }
+          
+          // Priority 2: Longest non-generic name
+          candidates.sort((a, b) => b.length.compareTo(a.length));
+          for (final candidate in candidates) {
+            final lower = candidate.toLowerCase();
+            // Skip truly generic single-word names
+            if (lower != 'body' && lower != 'content') {
+              return _toSnakeCase(candidate);
+            }
+          }
+          
+          // Fallback: use the first one
+          return _toSnakeCase(candidates.first);
+        }
       }
 
-      // Strategy 2: Check route.settings.arguments for a screen name
-      final args = route.settings.arguments;
-      if (args is Map && args.containsKey('screenName')) {
-        return args['screenName'].toString();
-      }
-
-      // Strategy 3: Try to parse route.toString() for page type info
-      // MaterialPageRoute often contains the page name in its string representation
+      // Strategy 2: Parse route.toString() with multiple patterns
       final routeString = route.toString();
-      final match = RegExp(r'→\s*(\w+)').firstMatch(routeString);
+      
+      // Pattern 1: "MaterialPageRoute(...) → WidgetName"
+      var match = RegExp(r'→\s*(\w+)').firstMatch(routeString);
       if (match != null) {
         final pageName = match.group(1)!;
         if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
           return _toSnakeCase(pageName);
         }
+      }
+      
+      // Pattern 2: "MaterialPageRoute<void>(...WidgetName...)"
+      match = RegExp(r'\(([A-Z][a-zA-Z0-9_]*(?:Screen|Page|View)?)\)').firstMatch(routeString);
+      if (match != null) {
+        final pageName = match.group(1)!;
+        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+          return _toSnakeCase(pageName);
+        }
+      }
+
+      // Strategy 3: Inspect overlay entries
+      if (route.overlayEntries.isNotEmpty) {
+        for (final entry in route.overlayEntries) {
+          final entryString = entry.toString();
+          final entryMatch = RegExp(r'(\w+(?:Screen|Page|View|Controller))').firstMatch(entryString);
+          if (entryMatch != null) {
+            final pageName = entryMatch.group(1)!;
+            if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+              return _toSnakeCase(pageName);
+            }
+          }
+        }
+      }
+
+      // Strategy 4: Check route.settings.arguments for a screen name
+      final args = route.settings.arguments;
+      if (args is Map && args.containsKey('screenName')) {
+        return _toSnakeCase(args['screenName'].toString());
       }
     } catch (_) {
       // Fail silently
@@ -236,6 +279,8 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       'Scaffold',
       'Material',
       'AnimatedPhysicalModel',
+      'PhysicalModel',
+      'PhysicalShape',
       'NotificationListener',
       'InheritedTheme',
       'IconTheme',
@@ -289,6 +334,51 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       'GestureDetector',
       'InkWell',
       'Visibility',
+      'Card',
+      'Divider',
+      'Drawer',
+      'AppBar',
+      'BottomNavigationBar',
+      'FloatingActionButton',
+      'IconButton',
+      'TextButton',
+      'ElevatedButton',
+      'OutlinedButton',
+      'TextField',
+      'Image',
+      'Icon',
+      'Text',
+      'RichText',
+      'Wrap',
+      'Flow',
+      'Table',
+      'TableCell',
+      'GridView',
+      'Hero',
+      'InheritedWidget',
+      'StatefulBuilder',
+      'ValueListenableBuilder',
+      'StreamBuilder',
+      'FutureBuilder',
+      'LayoutBuilder',
+      'OrientationBuilder',
+      'AspectRatio',
+      'Baseline',
+      'ConstraintsTransformBox',
+      'CustomPaint',
+      'BackdropFilter',
+      'ShaderMask',
+      'AnimatedContainer',
+      'AnimatedOpacity',
+      'AnimatedPadding',
+      'AnimatedAlign',
+      'AnimatedPositioned',
+      'AnimatedSwitcher',
+      'DecoratedBoxTransition',
+      'ScaleTransition',
+      'RotationTransition',
+      'SizeTransition',
+      'PositionedTransition',
     };
     return frameworkWidgets.contains(name);
   }
