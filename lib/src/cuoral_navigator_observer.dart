@@ -164,6 +164,21 @@ class CuoralNavigatorObserver extends NavigatorObserver {
   /// Extract the page widget name from the route's widget tree
   String? _extractPageName(ModalRoute<dynamic> route) {
     try {
+      // Strategy 0: For PageRoute builders, try to infer target widget directly.
+      // This avoids false positives like "MaterialPage" from route debug strings.
+      final buildContext = route.subtreeContext;
+      if (buildContext != null) {
+        if (route is MaterialPageRoute<dynamic>) {
+          final builtWidget = route.builder(buildContext);
+          final widgetName = builtWidget.runtimeType.toString();
+          if (_isValidScreenName(widgetName) &&
+              !_isFrameworkWidget(widgetName) &&
+              !_isRouteArtifactName(widgetName)) {
+            return _toSnakeCase(widgetName);
+          }
+        }
+      }
+
       // Strategy 1: Parse route.toString() FIRST (most reliable for unnamed routes)
       final routeString = route.toString();
 
@@ -172,7 +187,9 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       var match = RegExp(r'=>\s*([A-Z][a-zA-Z0-9_]+)').firstMatch(routeString);
       if (match != null) {
         final pageName = match.group(1)!;
-        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+        if (_isValidScreenName(pageName) &&
+            !_isFrameworkWidget(pageName) &&
+            !_isRouteArtifactName(pageName)) {
           return _toSnakeCase(pageName);
         }
       }
@@ -181,7 +198,9 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       match = RegExp(r'→\s*([A-Z][a-zA-Z0-9_]+)').firstMatch(routeString);
       if (match != null) {
         final pageName = match.group(1)!;
-        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+        if (_isValidScreenName(pageName) &&
+            !_isFrameworkWidget(pageName) &&
+            !_isRouteArtifactName(pageName)) {
           return _toSnakeCase(pageName);
         }
       }
@@ -190,7 +209,9 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       match = RegExp(r'([A-Z][a-zA-Z0-9_]*(?:Screen|Page|View))').firstMatch(routeString);
       if (match != null) {
         final pageName = match.group(1)!;
-        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+        if (_isValidScreenName(pageName) &&
+            !_isFrameworkWidget(pageName) &&
+            !_isRouteArtifactName(pageName)) {
           return _toSnakeCase(pageName);
         }
       }
@@ -209,6 +230,7 @@ class CuoralNavigatorObserver extends NavigatorObserver {
           // Skip private/internal framework widgets
           if (!widgetName.startsWith('_') &&
               !_isFrameworkWidget(widgetName) &&
+              !_isRouteArtifactName(widgetName) &&
               _isValidScreenName(widgetName)) {
             candidates.add(widgetName);
           }
@@ -255,7 +277,9 @@ class CuoralNavigatorObserver extends NavigatorObserver {
           ).firstMatch(entryString);
           if (entryMatch != null) {
             final pageName = entryMatch.group(1)!;
-            if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+            if (_isValidScreenName(pageName) &&
+                !_isFrameworkWidget(pageName) &&
+                !_isRouteArtifactName(pageName)) {
               return _toSnakeCase(pageName);
             }
           }
@@ -393,6 +417,22 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       'PositionedTransition',
     };
     return frameworkWidgets.contains(name);
+  }
+
+  /// Reject framework route/page artifacts that are not user screen names.
+  bool _isRouteArtifactName(String name) {
+    const artifacts = {
+      'MaterialPage',
+      'CupertinoPage',
+      'NoTransitionPage',
+      'Page',
+      'RoutePage',
+      'MaterialPageRoute',
+      'CupertinoPageRoute',
+    };
+    if (artifacts.contains(name)) return true;
+    if (name.endsWith('Route') || name.endsWith('Transition')) return true;
+    return false;
   }
 
   /// Convert PascalCase to snake_case: "HomeScreen" → "home_screen"

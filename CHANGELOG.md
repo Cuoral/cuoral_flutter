@@ -1,3 +1,10 @@
+## 0.1.8
+
+* **HOTFIX:** Fixed unnamed route false detection that produced `/material_page`
+* Added route artifact filtering to ignore framework page/route names like `MaterialPage` and `CupertinoPage`
+* Improved MaterialPageRoute builder-based widget inference before route-string fallbacks
+
+
 ## 0.1.7
 
 * Removed unused `CuoralNavigationReporter` implementation to avoid future confusion
