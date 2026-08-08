@@ -1,3 +1,11 @@
+## 0.1.5
+
+* **CRITICAL FIX:** Reordered route detection strategies to parse route.toString() FIRST before widget tree walking
+* Added better regex patterns to detect screen names from MaterialPageRoute builder lambda syntax (=> WidgetName)
+* Fixed issue where route.subtreeContext was null/unavailable causing all unnamed routes to show as "/page"
+* Now detects unnamed routes like `Navigator.push(context, MaterialPageRoute(builder: (context) => ScreenName()))` correctly
+
+
 ## 0.1.4
 
 * Enhanced unnamed route detection with deep widget tree traversal (up to 20 levels)

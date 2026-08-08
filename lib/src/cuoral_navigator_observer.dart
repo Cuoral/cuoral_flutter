@@ -164,42 +164,73 @@ class CuoralNavigatorObserver extends NavigatorObserver {
   /// Extract the page widget name from the route's widget tree
   String? _extractPageName(ModalRoute<dynamic> route) {
     try {
-      // Strategy 1: Deep widget tree traversal (works after frame is built)
+      // Strategy 1: Parse route.toString() FIRST (most reliable for unnamed routes)
+      final routeString = route.toString();
+      
+      // Pattern 1: "MaterialPageRoute(...builder: BuildContext => WidgetName...)"
+      // This catches the lambda arrow syntax
+      var match = RegExp(r'=>\s*([A-Z][a-zA-Z0-9_]+)').firstMatch(routeString);
+      if (match != null) {
+        final pageName = match.group(1)!;
+        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+          return _toSnakeCase(pageName);
+        }
+      }
+
+      // Pattern 2: "MaterialPageRoute(...) → WidgetName"
+      match = RegExp(r'→\s*([A-Z][a-zA-Z0-9_]+)').firstMatch(routeString);
+      if (match != null) {
+        final pageName = match.group(1)!;
+        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+          return _toSnakeCase(pageName);
+        }
+      }
+
+      // Pattern 3: Look for any Screen/Page/View class name in the route string
+      match = RegExp(r'([A-Z][a-zA-Z0-9_]*(?:Screen|Page|View))').firstMatch(routeString);
+      if (match != null) {
+        final pageName = match.group(1)!;
+        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
+          return _toSnakeCase(pageName);
+        }
+      }
+
+      // Strategy 2: Deep widget tree traversal (backup if string parsing fails)
       final subtreeContext = route.subtreeContext;
       if (subtreeContext != null) {
         final candidates = <String>[];
-        
+
         // Deep traversal to collect ALL potential user widgets
         void visitor(Element element, int depth) {
           if (depth > 20) return; // Prevent infinite loops
-          
+
           final widgetName = element.widget.runtimeType.toString();
-          
+
           // Skip private/internal framework widgets
-          if (!widgetName.startsWith('_') && 
+          if (!widgetName.startsWith('_') &&
               !_isFrameworkWidget(widgetName) &&
               _isValidScreenName(widgetName)) {
             candidates.add(widgetName);
           }
-          
+
           // Continue traversing children
           element.visitChildElements((child) => visitor(child, depth + 1));
         }
-        
+
         subtreeContext.visitChildElements((e) => visitor(e, 0));
-        
+
         // Pick the best candidate (prefer user widgets with common suffixes)
         if (candidates.isNotEmpty) {
           // Priority 1: Widgets ending with Screen, Page, View, Widget
           for (final candidate in candidates) {
-            if (candidate.endsWith('Screen') || 
-                candidate.endsWith('Page') || 
+            if (candidate.endsWith('Screen') ||
+                candidate.endsWith('Page') ||
                 candidate.endsWith('View') ||
                 candidate.endsWith('Widget')) {
               return _toSnakeCase(candidate);
             }
           }
-          
+
           // Priority 2: Longest non-generic name
           candidates.sort((a, b) => b.length.compareTo(a.length));
           for (final candidate in candidates) {
@@ -209,30 +240,9 @@ class CuoralNavigatorObserver extends NavigatorObserver {
               return _toSnakeCase(candidate);
             }
           }
-          
+
           // Fallback: use the first one
           return _toSnakeCase(candidates.first);
-        }
-      }
-
-      // Strategy 2: Parse route.toString() with multiple patterns
-      final routeString = route.toString();
-      
-      // Pattern 1: "MaterialPageRoute(...) → WidgetName"
-      var match = RegExp(r'→\s*(\w+)').firstMatch(routeString);
-      if (match != null) {
-        final pageName = match.group(1)!;
-        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
-          return _toSnakeCase(pageName);
-        }
-      }
-      
-      // Pattern 2: "MaterialPageRoute<void>(...WidgetName...)"
-      match = RegExp(r'\(([A-Z][a-zA-Z0-9_]*(?:Screen|Page|View)?)\)').firstMatch(routeString);
-      if (match != null) {
-        final pageName = match.group(1)!;
-        if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
-          return _toSnakeCase(pageName);
         }
       }
 
@@ -240,7 +250,9 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       if (route.overlayEntries.isNotEmpty) {
         for (final entry in route.overlayEntries) {
           final entryString = entry.toString();
-          final entryMatch = RegExp(r'(\w+(?:Screen|Page|View|Controller))').firstMatch(entryString);
+          final entryMatch = RegExp(
+            r'([A-Z][a-zA-Z0-9_]*(?:Screen|Page|View|Controller))',
+          ).firstMatch(entryString);
           if (entryMatch != null) {
             final pageName = entryMatch.group(1)!;
             if (_isValidScreenName(pageName) && !_isFrameworkWidget(pageName)) {
