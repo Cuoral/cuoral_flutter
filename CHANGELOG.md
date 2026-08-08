@@ -1,3 +1,10 @@
+## 0.1.7
+
+* Removed unused `CuoralNavigationReporter` implementation to avoid future confusion
+* Added `CuoralNavigationObserver` export in `cuoral_flutter.dart` for compatibility and simpler imports
+* Kept `CuoralNavigationObserver` mapped to the enhanced unnamed-route detector path
+
+
 ## 0.1.6
 
 * **CRITICAL FIX:** `CuoralNavigationObserver` now uses the enhanced unnamed-route detector (`CuoralNavigatorObserver`) internally

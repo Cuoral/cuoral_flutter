@@ -47,6 +47,7 @@ export 'src/event_queue.dart' show EventQueue;
 
 // Navigation tracking
 export 'src/cuoral_navigator_observer.dart' show CuoralNavigatorObserver;
+export 'cuoral_navigation_observer.dart' show CuoralNavigationObserver;
 
 // Error handling
 export 'src/cuoral_error_handler.dart' show CuoralErrorHandler;
@@ -60,4 +61,4 @@ export 'cuoral_launcher.dart' show CuoralLauncher;
 export 'src/cuoral_overlay.dart' show CuoralOverlay;
 
 /// Version information
-const String version = '0.1.6';
+const String version = '0.1.7';
