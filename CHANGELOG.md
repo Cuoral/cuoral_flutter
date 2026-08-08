@@ -1,3 +1,10 @@
+## 0.1.6
+
+* **CRITICAL FIX:** `CuoralNavigationObserver` now uses the enhanced unnamed-route detector (`CuoralNavigatorObserver`) internally
+* Fixed production issue where apps using `CuoralNavigationObserver()` still resolved unnamed `MaterialPageRoute` screens as `/page`
+* Removed temporary debug logging from navigator detection internals
+
+
 ## 0.1.5
 
 * **CRITICAL FIX:** Reordered route detection strategies to parse route.toString() FIRST before widget tree walking
@@ -58,7 +65,6 @@
 ## 0.0.1
 
 * First release of cuoral flutter SDK
-
 
 ## 0.0.2
 

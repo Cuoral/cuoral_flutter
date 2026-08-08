@@ -166,7 +166,7 @@ class CuoralNavigatorObserver extends NavigatorObserver {
     try {
       // Strategy 1: Parse route.toString() FIRST (most reliable for unnamed routes)
       final routeString = route.toString();
-      
+
       // Pattern 1: "MaterialPageRoute(...builder: BuildContext => WidgetName...)"
       // This catches the lambda arrow syntax
       var match = RegExp(r'=>\s*([A-Z][a-zA-Z0-9_]+)').firstMatch(routeString);

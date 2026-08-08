@@ -60,4 +60,4 @@ export 'cuoral_launcher.dart' show CuoralLauncher;
 export 'src/cuoral_overlay.dart' show CuoralOverlay;
 
 /// Version information
-const String version = '0.1.5';
+const String version = '0.1.6';
