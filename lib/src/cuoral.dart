@@ -510,4 +510,46 @@ class Cuoral {
     _intelligence?.dispose();
     _isInitialized = false;
   }
+
+  /// Clear the current session
+  ///
+  /// Useful when a user logs out of your application.
+  /// This will remove the session from local storage, notify the backend to end the session,
+  /// and reset the SDK state.
+  Future<void> clearSession() async {
+    try {
+      // Notify backend to end the session if we have one
+      if (_sessionId != null && _publicKey != null) {
+        try {
+          final url = Uri.parse('$_baseUrl/conversation/end-session');
+          final body = {'session_id': _sessionId};
+
+          await http
+              .post(
+                url,
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-org-id': _publicKey!,
+                },
+                body: jsonEncode(body),
+              )
+              .timeout(const Duration(seconds: 5));
+        } catch (e) {
+          // Fail silently if network request fails, we still want to clear local state
+        }
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_storageKey);
+      _sessionId = null;
+      _email = null;
+      _firstName = null;
+      _lastName = null;
+      _intelligence?.dispose();
+      _intelligence = null;
+      _isInitialized = false;
+    } catch (e) {
+      // Fail silently
+    }
+  }
 }

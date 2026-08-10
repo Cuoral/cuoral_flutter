@@ -412,20 +412,6 @@ class _CuoralWidgetState extends State<CuoralWidget> {
                       "HTTP Error loading Cuoral widget: ${response.statusCode} - ${response.reasonPhrase}";
                 });
               },
-              onReceivedServerTrustAuthRequest: (controller, challenge) async {
-                // Automatically accept SSL certificates for Cuoral domains
-                final host = challenge.protectionSpace.host;
-                if (host == 'js.cuoral.com' ||
-                    host == 'api.cuoral.com' ||
-                    host == 'wss.cuoral.com') {
-                  return ServerTrustAuthResponse(
-                    action: ServerTrustAuthResponseAction.PROCEED,
-                  );
-                }
-                return ServerTrustAuthResponse(
-                  action: ServerTrustAuthResponseAction.CANCEL,
-                );
-              },
               onPermissionRequest: (controller, request) async {
                 if (request.resources.contains(
                   PermissionResourceType.GEOLOCATION,
@@ -452,7 +438,9 @@ class _CuoralWidgetState extends State<CuoralWidget> {
                 );
               },
               onConsoleMessage: (controller, consoleMessage) {
-                // Suppress console messages
+                if (kDebugMode) {
+                  print("Cuoral Widget Console: ${consoleMessage.message}");
+                }
               },
               onJsPrompt: (controller, jsPromptRequest) async {
                 return JsPromptResponse(message: '');

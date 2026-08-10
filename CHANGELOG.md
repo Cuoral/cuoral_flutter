@@ -1,3 +1,32 @@
+## 0.1.15
+
+* **FEATURE:** `clearSession()` now calls the backend API (`/conversation/end-session`) to properly close the session on the server side before clearing local storage.
+
+## 0.1.14
+
+* **FEATURE:** Added `clearSession()` method to `Cuoral.instance` to allow developers to clear the current session (e.g., on user logout).
+
+## 0.1.13
+
+* **FIX:** Removed `onReceivedServerTrustAuthRequest` entirely to allow the OS to handle all SSL certificate validation natively. This prevents any accidental blocking of valid third-party assets or WebSockets.
+
+## 0.1.12
+
+* **FIX:** Broadened SSL trust handling to accept any subdomain of `cuoral.com` (e.g., `wss.cuoral.com`, `api.cuoral.com`, `js.cuoral.com`) to ensure WebSockets and APIs connect reliably.
+
+## 0.1.11
+
+* **CRITICAL FIX:** Fixed an issue where `onReceivedServerTrustAuthRequest` was returning `CANCEL` for all non-Cuoral domains. This was actively blocking the WebView from loading third-party assets (like SVGs) and causing the widget to appear "OFFLINE".
+* Enabled console logging in debug mode to help troubleshoot future WebView issues.
+
+## 0.1.10
+
+* **HOTFIX:** Replaced `isCrossSiteTrackingPreventionEnabled` (which caused compilation errors on newer versions of `flutter_inappwebview`) with `isFraudulentWebsiteWarningEnabled: false` to help mitigate iOS WebView blocking issues.
+
+## 0.1.9
+
+* **FIX:** Disabled Intelligent Tracking Prevention (ITP) on iOS (`isCrossSiteTrackingPreventionEnabled: false`) to prevent `WKWebView` from blocking cross-origin resources, WebSockets, and cookies.
+
 ## 0.1.8
 
 * **HOTFIX:** Fixed unnamed route false detection that produced `/material_page`
