@@ -329,6 +329,30 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.chat_bubble_outline),
               label: const Text('Open Chat (Programmatic)'),
             ),
+
+            const SizedBox(height: 16),
+
+            // Session Management Demo
+            const Text(
+              'Session Management',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await Cuoral.instance.clearSession();
+                _showSnackBar('Session cleared (User logged out)');
+                
+                // Force UI update to show new session status
+                setState(() {});
+              },
+              icon: const Icon(Icons.logout),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[800],
+                foregroundColor: Colors.white,
+              ),
+              label: const Text('Logout / Clear Session'),
+            ),
           ],
         ),
       ),
