@@ -206,7 +206,9 @@ class CuoralNavigatorObserver extends NavigatorObserver {
       }
 
       // Pattern 3: Look for any Screen/Page/View class name in the route string
-      match = RegExp(r'([A-Z][a-zA-Z0-9_]*(?:Screen|Page|View))').firstMatch(routeString);
+      match = RegExp(
+        r'([A-Z][a-zA-Z0-9_]*(?:Screen|Page|View))',
+      ).firstMatch(routeString);
       if (match != null) {
         final pageName = match.group(1)!;
         if (_isValidScreenName(pageName) &&
