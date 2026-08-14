@@ -1,3 +1,7 @@
+## 0.1.16
+
+* **FIX:** Ignored harmless iOS WebKit errors (`WebKitErrorDomain code 204`, "Plug-in handled load") that were incorrectly triggering the error screen and hiding the widget.
+
 ## 0.1.15
 
 * **FEATURE:** `clearSession()` now calls the backend API (`/conversation/end-session`) to properly close the session on the server side before clearing local storage.

@@ -342,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 await Cuoral.instance.clearSession();
                 _showSnackBar('Session cleared (User logged out)');
-                
+
                 // Force UI update to show new session status
                 setState(() {});
               },

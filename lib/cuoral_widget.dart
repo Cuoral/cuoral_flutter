@@ -399,6 +399,14 @@ class _CuoralWidgetState extends State<CuoralWidget> {
                 }
               },
               onLoadError: (controller, url, code, message) {
+                // Ignore harmless iOS WebKit errors like "Plug-in handled load" (code 204)
+                // or cancelled requests (code -999)
+                if (message.contains('Plug-in handled load') ||
+                    message.contains('code=204') ||
+                    code == -999) {
+                  return;
+                }
+
                 setState(() {
                   _isLoading = false;
                   _errorMessage =
