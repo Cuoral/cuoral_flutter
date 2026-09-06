@@ -1,3 +1,7 @@
+## 0.1.17
+
+* **FIX:** Removed `RECORD_AUDIO`, `FOREGROUND_SERVICE`, and `FOREGROUND_SERVICE_MEDIA_PROJECTION` permissions from the Android Manifest to prevent Google Play Store rejections and reduce unnecessary permission requests, as screen recording is disabled on mobile.
+
 ## 0.1.16
 
 * **FIX:** Ignored harmless iOS WebKit errors (`WebKitErrorDomain code 204`, "Plug-in handled load") that were incorrectly triggering the error screen and hiding the widget.
